@@ -11,7 +11,7 @@ def read_token():
 
 token = read_token()
 client = discord.Client()
-messages = joined = 0
+messages = joined = player = 0
 
 @client.event
 async def on_connect():
@@ -26,9 +26,9 @@ async def on_ready():
 @client.event
 async def on_message(message):
 
-    global messages
+    global messages, player
     messages += 1
-    allowed_channels = ["bottest"]
+    allowed_channels = ["genel", "bottest"]
 
     if str(message.channel) in allowed_channels:
 
@@ -47,6 +47,9 @@ async def on_message(message):
         elif message.content.startswith('$dice'):
             await message.channel.send(randint(1,6), mention_author=True)
 
+        elif message.content.startswith('<a:ratJAM:823610543520612364>'):
+            await message.add_reaction('<a:ratJAM:823610543520612364>')
+
         elif message.content.startswith('$users'):
             await message.channel.send(f"Number of Members: {message.guild.member_count}")
             
@@ -56,21 +59,44 @@ async def on_message(message):
         elif not message.guild: # on direct message taken
             await message.channel.send('not answering to dms')
 
-        elif message.content.startswith('$thumb'): # send back the chosen reaction
+        elif message.content.startswith('$aram'): 
             channel = message.channel
-            msg = await channel.send('Send me 👍 reaction in 10 seconds')
-            await msg.add_reaction('👍')
-            await msg.add_reaction('👎')
+            playerNumber = 0
+            player_list = []
+            nplayer_list = []
+            emptyPlayer = ""
+            emptynPlayer = ""
+            call_msg = "5 kişi çıktı oyuna girin"
+            msg = await channel.send('Aram gelen ✅ atsın, gelmeyen ❌')
+            await msg.add_reaction('✅')
+            await msg.add_reaction('❌')
 
             def check(reaction, user):
-                return user == message.author and str(reaction.emoji) == '👍'
+                return (str(reaction.emoji) == '✅') or (str(reaction.emoji) == '❌')
 
-            try:
-                reaction, user = await client.wait_for('reaction_add', timeout=10.0, check=check)
-            except asyncio.TimeoutError:
-                await channel.send('👎 timeout')
-            else:
-                await channel.send('👍')
+            while playerNumber < 5:
+                reaction, user = await client.wait_for('reaction_add', check=check)
+                if str(reaction.emoji) == '✅':
+                    if user not in player_list and user not in nplayer_list:
+                        playerNumber += 1
+                        player_list.append(user)
+                        await channel.send(f"{user.mention} arama geliyor <a:ratJAM:823610543520612364> {playerNumber}/5")
+                        if playerNumber == 5:
+                            embed = discord.Embed(title = "Aram")
+                            for player in player_list:
+                                emptyPlayer = emptyPlayer + "\n" + str(player)
+                                call_msg = call_msg + " " + user.mention
+                            for nplayer in nplayer_list:
+                                emptynPlayer = emptynPlayer + "\n" + str(nplayer)
+                            embed.add_field(name = "Gelenler", value = f"{emptyPlayer}")
+                            embed.add_field(name = "Gelmeyenler", value = f"-{emptynPlayer}")
+                            await message.channel.send(content=None, embed=embed)
+                            await channel.send(call_msg)
+                else:
+                    if user not in nplayer_list and user not in player_list:
+                        nplayer_list.append(user)
+                        await channel.send(f"{user.mention} gelmiyor <:sie_deep:645740921790398484>")
+                      
     else:
         print(f"""User:{message.author} tried to do command {message.content} in channel {message.channel}""")
 
