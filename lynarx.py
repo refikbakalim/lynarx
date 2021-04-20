@@ -11,7 +11,7 @@ def read_token():
 
 token = read_token()
 client = discord.Client()
-messages = joined = player = 0
+messages = joined = player = aram = 0
 
 @client.event
 async def on_connect():
@@ -26,11 +26,18 @@ async def on_ready():
 @client.event
 async def on_message(message):
 
-    global messages, player
+    if message.author == client.user:
+        return
+
+    global messages, player, aram
+   
     messages += 1
     allowed_channels = ["genel", "bottest"]
-
+    
     if str(message.channel) in allowed_channels:
+
+        if '<a:ratJAM:823610543520612364>' in message.content:
+            await message.add_reaction('<a:ratJAM:823610543520612364>')
 
         if message.content.startswith('$hello'):
             await message.reply('Hello!', mention_author=True)
@@ -47,9 +54,8 @@ async def on_message(message):
         elif message.content.startswith('$dice'):
             await message.channel.send(randint(1,6), mention_author=True)
 
-        elif message.content.startswith('<a:ratJAM:823610543520612364>'):
-            await message.add_reaction('<a:ratJAM:823610543520612364>')
-
+        elif message.content.startswith('$selftest'):
+            await message.channel.send('$selftest')
         elif message.content.startswith('$users'):
             await message.channel.send(f"Number of Members: {message.guild.member_count}")
             
@@ -59,7 +65,10 @@ async def on_message(message):
         elif not message.guild: # on direct message taken
             await message.channel.send('not answering to dms')
 
-        elif message.content.startswith('$aram'): 
+        elif message.content.startswith('$aram'):
+            if aram:
+                return
+            aram = 1
             channel = message.channel
             playerNumber = 0
             player_list = []
@@ -76,27 +85,29 @@ async def on_message(message):
 
             while playerNumber < 5:
                 reaction, user = await client.wait_for('reaction_add', check=check)
-                if str(reaction.emoji) == '✅':
-                    if user not in player_list and user not in nplayer_list:
-                        playerNumber += 1
-                        player_list.append(user)
-                        await channel.send(f"{user.mention} arama geliyor <a:ratJAM:823610543520612364> {playerNumber}/5")
-                        if playerNumber == 5:
-                            embed = discord.Embed(title = "Aram")
-                            for player in player_list:
-                                emptyPlayer = emptyPlayer + "\n" + str(player)
-                                call_msg = call_msg + " " + user.mention
-                            for nplayer in nplayer_list:
-                                emptynPlayer = emptynPlayer + "\n" + str(nplayer)
-                            embed.add_field(name = "Gelenler", value = f"{emptyPlayer}")
-                            embed.add_field(name = "Gelmeyenler", value = f"-{emptynPlayer}")
-                            await message.channel.send(content=None, embed=embed)
-                            await channel.send(call_msg)
-                else:
-                    if user not in nplayer_list and user not in player_list:
-                        nplayer_list.append(user)
-                        await channel.send(f"{user.mention} gelmiyor <:sie_deep:645740921790398484>")
-                      
+                if user != client.user:
+                    if str(reaction.emoji) == '✅':
+                        if user not in player_list and user not in nplayer_list:
+                            playerNumber += 1
+                            player_list.append(user)
+                            await channel.send(f"{user.mention} arama geliyor <a:ratJAM:823610543520612364> {playerNumber}/5")
+                            if playerNumber == 5:
+                                embed = discord.Embed(title = "Aram")
+                                for player in player_list:
+                                    emptyPlayer = emptyPlayer + "\n" + str(player)
+                                    call_msg = call_msg + " " + player.mention
+                                for nplayer in nplayer_list:
+                                    emptynPlayer = emptynPlayer + "\n" + str(nplayer)
+                                embed.add_field(name = "Gelenler", value = f"{emptyPlayer}")
+                                embed.add_field(name = "Gelmeyenler", value = f"-{emptynPlayer}")
+                                await message.channel.send(content=None, embed=embed)
+                                await channel.send(call_msg)
+                                aram = 0
+                    elif str(reaction.emoji) == '❌':
+                        if user not in nplayer_list and user not in player_list:
+                            nplayer_list.append(user)
+                            await channel.send(f"{user.mention} gelmiyor <:sie_deep:645740921790398484>")
+                
     else:
         print(f"""User:{message.author} tried to do command {message.content} in channel {message.channel}""")
 
