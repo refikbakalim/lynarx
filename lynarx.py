@@ -41,7 +41,7 @@ async def on_message(message):
             embed.add_field(name = "$hello", value = "Greets the user with a reply")
             embed.add_field(name = "$dice", value = "Returns random number between 1 and 6")
             embed.add_field(name = "$dm", value = "Direct messages you with a test message")
-            embed.add_field(name = "$thumb", value = "Returns the emoji(👍,👎) you reacted with back")
+            embed.add_field(name = "$aram", value = "aram")
             await message.channel.send(content=None, embed=embed)
 
         elif message.content.startswith('$dice'):
