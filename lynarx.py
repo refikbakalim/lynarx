@@ -73,7 +73,21 @@ async def on_message(message): #when a message comes
             embed.add_field(name = bot_prefix + "exit", value = "Disconnects the bot")
             embed.add_field(name = bot_prefix + "prefix", value = f"Changes the prefix, current \"{bot_prefix}\"")
             embed.add_field(name = bot_prefix + "teamup", value = "Creates two teams with given players")
+            embed.add_field(name = bot_prefix + "echo", value = "Echoes the given sentence")
             await message.channel.send(content=None, embed=embed)
+
+
+        elif message.content.startswith(bot_prefix + "echo"): #Echoes the given sentence, and deletes the message that calls it
+            try:
+                msg = (message.content.split())[1:]
+                output = ""
+                for word in msg:
+                    output += word + " "
+                await message.delete()
+                await message.channel.send(output)
+
+            except:
+                await message.channel.send(f"Wrong input")
 
         elif message.content.startswith(bot_prefix + "prefix"): #changes the prefix of bot default "!"
             try:
@@ -117,16 +131,16 @@ async def on_message(message): #when a message comes
 
 
         elif message.content.startswith(bot_prefix + "delete"): #deletes messages, 50 max in 1 run
-            if(message.author.id == 181439459894624256): #only Sacrier#2869 can delete messages
-                message_number = int(message.content.split()[1])
-                if message_number > 0:
-                    if message_number > 50:
-                        message_number = 50
-                    try:
+            try:
+                if(message.author.id == 181439459894624256): #only Sacrier#2869 can delete messages
+                    message_number = int(message.content.split()[1])
+                    if message_number > 0:
+                        if message_number > 50:
+                            message_number = 50
                         await message.channel.purge(limit=message_number + 1)
                         await message.channel.send(f"Deleted {message_number} messages")
-                    except:
-                        await message.channel.send(f"Write a proper integer Ex. {bot_prefix}delete 5 " + message.author.mention, mention_author=True)
+            except:
+                await message.channel.send(f"Write a proper integer Ex. {bot_prefix}delete 5 " + message.author.mention, mention_author=True)
 
                     
         elif message.content.startswith(bot_prefix + "restart"): #restarts the bot by creating new process
