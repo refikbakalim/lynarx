@@ -5,6 +5,7 @@ import time
 import datetime
 import os
 import sys
+import math
 
 def read_token(): #reads discord bot token from the txt
     with open("token.txt", "r") as f:
@@ -71,6 +72,7 @@ async def on_message(message): #when a message comes
             embed.add_field(name = bot_prefix + "restart", value = "Restarts the bot")
             embed.add_field(name = bot_prefix + "exit", value = "Disconnects the bot")
             embed.add_field(name = bot_prefix + "prefix", value = f"Changes the prefix, current \"{bot_prefix}\"")
+            embed.add_field(name = bot_prefix + "teamup", value = "Creates two teams with given players")
             await message.channel.send(content=None, embed=embed)
 
         elif message.content.startswith(bot_prefix + "prefix"): #changes the prefix of bot default "!"
@@ -83,6 +85,31 @@ async def on_message(message): #when a message comes
                 with open('prefix.txt', "w") as file:
                         file.write(bot_prefix)
                 await message.channel.send(f"Changed prefix to \"{bot_prefix}\"")
+
+            except:
+                await message.channel.send(f"Wrong input")
+
+        elif message.content.startswith(bot_prefix + "teamup"): #Creates two teams with given players
+            try:
+                player_list = message.content.split()[1:]
+                team1_number = math.floor(len(player_list)/2)
+                random.shuffle(player_list)
+                team1 = ""
+                team2 = ""
+
+                embed = discord.Embed(title = "Teams")
+
+                for player in player_list[:team1_number]:
+                    team1 = team1 + "\n" + str(player)
+
+
+                for player in player_list[team1_number:]:
+                    team2 = team2 + "\n" + str(player)
+
+                embed.add_field(name = "Team1", value = f"{team1}")
+                embed.add_field(name = "Team2", value = f"{team2}")
+
+                await message.channel.send(content=None, embed=embed)
 
             except:
                 await message.channel.send(f"Wrong input")
