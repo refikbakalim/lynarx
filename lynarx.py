@@ -36,7 +36,6 @@ async def on_ready(): #when ready to operate print the status
     print("Ready")
     print('------')
 
-
 @client.event
 async def on_message(message): #when a message comes
 
@@ -63,19 +62,47 @@ async def on_message(message): #when a message comes
                 f.write(f"Date:{datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S')} {message.author} : {message.content}  \n")
 
         elif message.content.startswith(bot_prefix + "help"): # shows help menu
-            bot_channel = client.get_channel(594596796890873871) # gets the id of "bot" channel
-            aram_channel = client.get_channel(848731423645106217) # gets the id of "aram" channel
-            embed = discord.Embed(title = "Commands", description = "Description of the commands")
-            embed.add_field(name = bot_prefix + "delete", value = "Deletes messages")
-            embed.add_field(name = bot_prefix + "dice", value = "Returns random number between 1 and 6")
-            embed.add_field(name = bot_prefix + "aram", value = f'only works in {bot_channel.mention} and {aram_channel.mention}')
-            embed.add_field(name = bot_prefix + "restart", value = "Restarts the bot")
-            embed.add_field(name = bot_prefix + "exit", value = "Disconnects the bot")
-            embed.add_field(name = bot_prefix + "prefix", value = f"Changes the prefix, current \"{bot_prefix}\"")
-            embed.add_field(name = bot_prefix + "teamup", value = "Creates two teams with given players")
-            embed.add_field(name = bot_prefix + "echo", value = "Echoes the given sentence")
-            await message.channel.send(content=None, embed=embed)
-
+            try:
+                msg = message.content.split()
+                if (len(msg) == 1):
+                    bot_channel = client.get_channel(594596796890873871) # gets the id of "bot" channel
+                    aram_channel = client.get_channel(848731423645106217) # gets the id of "aram" channel
+                    embed = discord.Embed(title = "Command List", description = "use \"help commandName\" to get detailed information about a command") 
+                    embed.add_field(name = bot_prefix + "delete", value = '\u200b')
+                    embed.add_field(name = bot_prefix + "dice", value = '\u200b')
+                    embed.add_field(name = bot_prefix + "aram", value = '\u200b')
+                    embed.add_field(name = bot_prefix + "restart", value = '\u200b')
+                    embed.add_field(name = bot_prefix + "exit", value = '\u200b')
+                    embed.add_field(name = bot_prefix + "prefix", value = '\u200b')
+                    embed.add_field(name = bot_prefix + "teamup", value = '\u200b')
+                    embed.add_field(name = bot_prefix + "echo", value = '\u200b')
+                    embed.add_field(name = bot_prefix + "random", value = '\u200b')
+                    await message.channel.send(content=None, embed=embed)
+                else:
+                    response = ""
+                    if(msg[1] == "help"): 
+                        response = "\"help\" shows the list of commands. Call it with a command name to get more information. Usage: \"help\" or \"help dice\""
+                    elif(msg[1] == "delete"):
+                        response = "\"delete\" deletes the number of messages given with command. Maximum deletion in one command is 50. Usage: \"delete 5\""
+                    elif(msg[1] == "dice"): 
+                        response = "\"dice\" returns a number ranged 1 to 6. Usage: \"dice\""  
+                    elif(msg[1] == "aram"):  
+                        response = "\"aram\" starts an invition for aram and builds teams when enough people accepts. Default is 5 players but if two teams needed 6, 8, 10 can be used. Usage: \"aram\" or \"aram 10\"" 
+                    elif(msg[1] == "restart"):  
+                        response = "\"restart\" restarts the bot. Bot needs approximately 3 seconds to wake up again. Usage: \"restart\"" 
+                    elif(msg[1] == "exit"):
+                        response = "\"exit\" kills the bot. Only the owner can use it. So don't bother writing it. Usage: \"exit\"" 
+                    elif(msg[1] == "prefix"): 
+                        response = "\"prefix\" changes the bot's prefix. If no arguments given, the prefix will be changed to \"!\". Usage: \"prefix\" or \"prefix newPrefix\""
+                    elif(msg[1] == "teamup"): 
+                        response = "\"teamup\" makes two team from the given list of names. Usage: \"teamup A B C D\"" 
+                    elif(msg[1] == "echo"):
+                        response =  "\"echo\" echoes the sentence given after command. Usage: \"echo this is a test message\""
+                    elif(msg[1] == "random"):
+                        response = "\"random\" returns a random number from the given range. If one arguments is given the range is (1,given). Usage: \"random 20\" or \"random 5 20\""
+                    await message.channel.send(f"{response} {message.author.mention}")
+            except:
+                await message.channel.send(f"Wrong input")
 
         elif message.content.startswith(bot_prefix + "echo"): #Echoes the given sentence, and deletes the message that calls it
             try:
@@ -140,7 +167,7 @@ async def on_message(message): #when a message comes
                         await message.channel.purge(limit=message_number + 1)
                         await message.channel.send(f"Deleted {message_number} messages")
             except:
-                await message.channel.send(f"Write a proper integer Ex. {bot_prefix}delete 5 " + message.author.mention, mention_author=True)
+                await message.channel.send(f"Write a proper integer Ex. {bot_prefix}delete 5 {message.author.mention}")
 
                     
         elif message.content.startswith(bot_prefix + "restart"): #restarts the bot by creating new process
@@ -154,11 +181,24 @@ async def on_message(message): #when a message comes
                 await message.channel.send("Disconnecting...")
                 await client.close()
             else:
-                await message.channel.send("You can't shut down me " + message.author.mention, mention_author=True)
+                await message.channel.send(f"You can't shut down me {message.author.mention}")
 
 
         elif message.content.startswith(bot_prefix + "dice"): # dice 1to6
-            await message.channel.send(random.randint(1,6)  + " " + message.author.mention, mention_author=True)
+            try:
+                await message.channel.send(f"{random.randint(1,6)} {message.author.mention}")
+            except:
+                await message.channel.send(f"Wrong input")
+
+        elif message.content.startswith(bot_prefix + "random"): # choose random integer in given range, if one argument given range is (1,given)
+            try:
+                msg = message.content.split()
+                if(len(msg) > 2):
+                    await message.channel.send(f"{random.randint(int(msg[1]),int(msg[2]))} {message.author.mention}")
+                else:
+                    await message.channel.send(f"{random.randint(1,int(msg[1]))} {message.author.mention}")
+            except:
+                await message.channel.send(f"Wrong input")
 
 
         elif message.content.startswith(bot_prefix + "aram"): # tries to call people for aram
