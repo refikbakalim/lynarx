@@ -77,6 +77,7 @@ async def on_message(message): #when a message comes
                     embed.add_field(name = bot_prefix + "teamup", value = '\u200b')
                     embed.add_field(name = bot_prefix + "echo", value = '\u200b')
                     embed.add_field(name = bot_prefix + "random", value = '\u200b')
+                    embed.add_field(name = bot_prefix + "presence", value = '\u200b')
                     await message.channel.send(content=None, embed=embed)
                 else:
                     response = ""
@@ -91,7 +92,7 @@ async def on_message(message): #when a message comes
                     elif(msg[1] == "restart"):  
                         response = "\"restart\" restarts the bot. Bot needs approximately 3 seconds to wake up again. Usage: \"restart\"" 
                     elif(msg[1] == "exit"):
-                        response = "\"exit\" kills the bot. Only the owner can use it. So don't bother writing it. Usage: \"exit\"" 
+                        response = "\"exit\" kills the bot. Only the owner can use it. So, don't bother writing it. Usage: \"exit\"" 
                     elif(msg[1] == "prefix"): 
                         response = "\"prefix\" changes the bot's prefix. If no arguments given, the prefix will be changed to \"!\". Usage: \"prefix\" or \"prefix newPrefix\""
                     elif(msg[1] == "teamup"): 
@@ -100,6 +101,8 @@ async def on_message(message): #when a message comes
                         response =  "\"echo\" echoes the sentence given after command. Usage: \"echo this is a test message\""
                     elif(msg[1] == "random"):
                         response = "\"random\" returns a random number from the given range. If one arguments is given the range is (1,given). Usage: \"random 20\" or \"random 5 20\""
+                    elif(msg[1] == "presence"):
+                        response = "\"presence\" changes activity of the bot. Activities can be playing, streaming, watching and listening. Everything takes an extra argument to show what are they doing in that activity. Streaming takes one more argument that is a twitch link. Usage: \"presence playing gameName\" or \"presence streaming gameName twitchLink\""
                     await message.channel.send(f"{response} {message.author.mention}")
             except:
                 await message.channel.send(f"Wrong input")
@@ -116,7 +119,7 @@ async def on_message(message): #when a message comes
             except:
                 await message.channel.send(f"Wrong input")
 
-        elif message.content.startswith(bot_prefix + "prefix"): #changes the prefix of bot default "!"
+        elif message.content.startswith(bot_prefix + "prefix"): #changes the prefix of bot, default "!"
             try:
                 if(len(message.content.split()) == 1):
                     bot_prefix = "!"
@@ -155,7 +158,38 @@ async def on_message(message): #when a message comes
             except:
                 await message.channel.send(f"Wrong input")
 
+        elif message.content.startswith(bot_prefix + "presence"): #changes bot's rich presence(game activity)
+            try:
+                if(message.author.id == 181439459894624256): #only Sacrier#2869 can change presence
+                    msg = message.content.split()
+                    presence = msg[1]
+                    activity = ""
+                    for elem in msg[2:]:
+                        activity += elem + " "
 
+                    if presence == "playing":
+                        await client.change_presence(activity=discord.Game(name=activity))
+                        await message.channel.send(f"Changed rich presence to \"Playing {activity}\"")
+
+                    elif presence == "streaming":
+                        length = len(msg)
+                        activity = ""
+                        link = msg[length-1]
+                        for elem in msg[2:length-1]:
+                            activity += elem + " "
+                        await client.change_presence(activity=discord.Streaming(name=activity, url=link))
+                        await message.channel.send(f"Changed rich presence to \"Streaming {activity}at {link}\"")
+
+                    elif presence == "listening":
+                        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=activity))
+                        await message.channel.send(f"Changed rich presence to \"Listening to {activity}\"")
+
+                    elif presence == "watching":
+                        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching,name=activity))
+                        await message.channel.send(f"Changed rich presence to \"Watching {activity}\"")
+     
+            except:
+                await message.channel.send(f"Wrong Input")
 
         elif message.content.startswith(bot_prefix + "delete"): #deletes messages, 50 max in 1 run
             try:
