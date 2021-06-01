@@ -102,7 +102,7 @@ async def on_message(message): #when a message comes
                     elif(msg[1] == "random"):
                         response = "\"random\" returns a random number from the given range. If one arguments is given the range is (1,given). Usage: \"random 20\" or \"random 5 20\""
                     elif(msg[1] == "presence"):
-                        response = "\"presence\" changes activity of the bot. Activities can be playing, streaming, watching and listening. Everything takes an extra argument to show what are they doing in that activity. Streaming takes one more argument that is a twitch link. Usage: \"presence playing gameName\" or \"presence streaming gameName twitchLink\""
+                        response = "\"presence\" changes activity of the bot. Activities can be playing, streaming, watching and listening. Everything takes an extra argument to show what are they doing in that activity. Streaming takes one more argument that is a twitch link. Usage: \"presence playing gameName\" or \"presence streaming gameName twitchLink\" or \"presence reset\""
                     await message.channel.send(f"{response} {message.author.mention}")
             except:
                 await message.channel.send(f"Wrong input")
@@ -187,7 +187,12 @@ async def on_message(message): #when a message comes
                     elif presence == "watching":
                         await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching,name=activity))
                         await message.channel.send(f"Changed rich presence to \"Watching {activity}\"")
-     
+                    
+                    elif presence == "reset":
+                        await client.change_presence()
+                    
+                    else:
+                        await message.channel.send(f"Wrong Input")
             except:
                 await message.channel.send(f"Wrong Input")
 
