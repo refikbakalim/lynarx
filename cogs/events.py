@@ -21,8 +21,6 @@ class Events(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message): #when a message comes
 
-        await self.bot.process_commands(message) #procces the commands first before looking into message
-
         if message.author == self.bot.user: #if the message comes from this bot, do nothing
             return
 
