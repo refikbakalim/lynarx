@@ -24,10 +24,9 @@ class Events(commands.Cog):
         if message.author == self.bot.user: #if the message comes from this bot, do nothing
             return
 
-        if not message.guild: #on direct message taken, send an answer and log the message
-            await message.author.send("I don't answer to private messages")
-            with open("dms.txt", "a", encoding="utf-8") as f:
-                f.write(f"Date:{datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S')} {message.author} : {message.content}  \n")
+        if not message.guild: #on direct message taken, direct message to owner
+            owner = await self.bot.fetch_user(181439459894624256)
+            await owner.send(str(message.author) + ": " + str(message.content))
 
         else:
             if 'ratjam' in message.content.lower(): # if ratJam exists in the message, add its emote as a reaction
