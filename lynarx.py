@@ -10,6 +10,8 @@ def read_prefix(): #reads the prefix it saved before
 
 intents = discord.Intents.default()
 intents.members = True
+intents.presences = True
+
 bot = commands.Bot(command_prefix=read_prefix(), intents=intents)
 
 for filename in os.listdir("./cogs"):
