@@ -35,16 +35,19 @@ class Admin(commands.Cog):
     @commands.check(is_owner)
     async def delete(self, ctx, arg : int):
         try:
-            message_number = arg
-            if message_number > 0:
-                if message_number > 50:
-                    message_number = 50
-                await ctx.channel.purge(limit=message_number + 1)
+            if ctx.guild is not None:
+                message_number = arg
+                if message_number > 0:
+                    if message_number > 50:
+                        message_number = 50
+                    await ctx.channel.purge(limit=message_number + 1)
 
-                if message_number == 1:
-                    await ctx.channel.send(f"Deleted 1 message", delete_after=3.0)
-                else:
-                    await ctx.channel.send(f"Deleted {message_number} messages", delete_after=3.0)
+                    if message_number == 1:
+                        await ctx.channel.send(f"Deleted 1 message", delete_after=3.0)
+                    else:
+                        await ctx.channel.send(f"Deleted {message_number} messages", delete_after=3.0)
+            else:
+                await ctx.message.author.send("This command does not work on direct message.", reference = ctx.message)
         except:
                 await ctx.channel.send(f"Exception occured")
 

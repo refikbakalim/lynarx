@@ -14,8 +14,11 @@ class Extras(commands.Cog):
     @commands.command(brief = brief_echo, description = description_echo) 
     async def echo(self, ctx, *, arg : str):
         try:
-            await ctx.message.delete()
-            await ctx.channel.send(arg)
+            if ctx.guild is not None:
+                await ctx.message.delete()
+                await ctx.channel.send(arg)
+            else:
+                await ctx.message.author.send("This command does not work on direct message.", reference = ctx.message)
         except:
             await ctx.channel.send("Exception occured")
 
