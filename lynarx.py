@@ -1,4 +1,3 @@
-from asyncio.windows_events import NULL
 from discord.ext import commands
 import os
 import discord
