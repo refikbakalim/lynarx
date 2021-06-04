@@ -50,6 +50,7 @@ class LeagueOfLegends(commands.Cog):
                 global aram_in_progress #define global variables
 
                 aram_role = ctx.guild.get_role(847982643702267935) #gets the id of "Aram" role so it can ping
+                owner = await self.bot.fetch_user(181439459894624256)
 
                 if aram_in_progress:
                     return
@@ -71,14 +72,18 @@ class LeagueOfLegends(commands.Cog):
                     call_msg = "Hazırlık bitti, oyuna girin"
                     uncall_msg = "Kişi sayısına ulaşılamadı"
 
-                    msg = await ctx.channel.send(f"Aram gelen ✅, gelmeyen ❌ {player_needed} kişi gerekiyor {aram_role.mention}")
-                    message_list.append(msg)
-                    await msg.add_reaction('✅')
-                    await msg.add_reaction('❌')
-                    await msg.add_reaction('🇫')
+                    original_msg = await ctx.channel.send(f"Aram gelen ✅, gelmeyen ❌ {player_needed} kişi gerekiyor {aram_role.mention}")
+                    message_list.append(original_msg)
+                    await original_msg.add_reaction('✅')
+                    await original_msg.add_reaction('❌')
+                    await original_msg.add_reaction('🇫')
 
                     def check(reaction, user):
-                        return (str(reaction.emoji) == '✅') or (str(reaction.emoji) == '❌') or (str(reaction.emoji) == '🇫')
+                        if reaction.message.id == original_msg.id:
+                            return (str(reaction.emoji) == '✅') or (str(reaction.emoji) == '❌') or (str(reaction.emoji) == '🇫')
+                        else:
+                            return False
+
 
                     while player_accepted < player_needed and aram_in_progress:
 
@@ -139,7 +144,7 @@ class LeagueOfLegends(commands.Cog):
                                     message_list.append(msg)
 
                             elif str(reaction.emoji) == '🇫':
-                                if user.id == 181439459894624256:
+                                if user.id == owner.id or user.id == ctx.author.id:
                                     for player in accepted_list:
                                             accepted_string = accepted_string + "\n" + str(player)
                                             uncall_msg = uncall_msg + " " + player.mention
