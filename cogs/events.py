@@ -48,17 +48,20 @@ class Events(commands.Cog):
                 await logs_channel.send(f"\"{before}\"s status has changed, \"{before.status}\" to \"{after.status}\"")
 
             elif not before.activity == after.activity:
-                if before.activity.type == ActivityType.streaming and after.activity.type == ActivityType.streaming:
-                    await logs_channel.send(f"\"{before}\"s activity has changed, \"{str(before.activity.type)[13:]} {before.activity.name} at {before.activity.url} {before.activity.details}\" to \"{str(after.activity.type)[13:]} {after.activity.name} at {after.activity.url} {after.activity.details}\"")
-                elif before.activity.type == ActivityType.streaming:
-                    await logs_channel.send(f"\"{before}\"s activity has changed, \"{str(before.activity.type)[13:]} {before.activity.name} at {before.activity.url} {before.activity.details}\" to \"{str(after.activity.type)[13:]} {after.activity.name} {after.activity.details}\"")
-                elif after.activity.type == ActivityType.streaming:
-                    await logs_channel.send(f"\"{before}\"s activity has changed, \"{str(before.activity.type)[13:]} {before.activity.name} {before.activity.details}\" to \"{str(after.activity.type)[13:]} {after.activity.name} at {after.activity.url} {after.activity.details}\"")
-                else:
-                    await logs_channel.send(f"\"{before}\"s activity has changed, \"{str(before.activity.type)[13:]} {before.activity.name} {before.activity.details}\" to \"{str(after.activity.type)[13:]} {after.activity.name} {after.activity.details}\"")
+                await logs_channel.send(f"\"{before}\"s activity has changed, \"{str(before.activity.type)[13:]} {before.activity.name} {before.activity.details} at url={before.activity.url}\" to \"{str(after.activity.type)[13:]} {after.activity.name} {after.activity.details} at url={after.activity.url}\"")
                 
             elif not before.roles == after.roles:
-                await logs_channel.send(f"\"{before}\"s roles has changed, \"{before.roles}\" to \"{after.roles}\"")
+                difference_list = list(set(before.roles) - set(after.roles)) + list(set(after.roles) - set(before.roles))
+                difference_string = ""
+                for role in difference_list:
+                    difference_string += role.name
+
+                if len(before.roles) > len(after.roles):
+                    await logs_channel.send(f"\"{before}\"s roles has changed, Lost the role \"{difference_string}\"")
+                
+                else:
+                    await logs_channel.send(f"\"{before}\"s roles has changed, Gained the role \"{difference_string}\"")
+
 
 
     @commands.Cog.listener()
