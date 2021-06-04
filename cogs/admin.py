@@ -136,8 +136,14 @@ class Admin(commands.Cog):
     @commands.check(is_owner)
     async def reload(self, ctx, arg):
         try:
-            self.bot.reload_extension(f"cogs.{arg}")
-            await ctx.channel.send(f"Cog \"{arg}\" has been reloaded.")
+            if arg == "all":
+                for filename in os.listdir("./cogs"):
+                    if filename.endswith(".py"):
+                        self.bot.reload_extension(f"cogs.{filename[:-3]}")
+                await ctx.channel.send("All cogs have been reloaded.")
+            else:
+                self.bot.reload_extension(f"cogs.{arg}")
+                await ctx.channel.send(f"Cog \"{arg}\" has been reloaded.")
         except:
             await ctx.channel.send(f"Exception occured")
 
