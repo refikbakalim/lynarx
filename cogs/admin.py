@@ -24,6 +24,8 @@ class Admin(commands.Cog):
     description_unload = "Unloads a cog. Commands in that cog can not be used now."
     brief_reload = "Reloads a cog"
     description_reload = "Reloads a cog. The cog will be updated."
+    brief_dm = "Directs messages the specified"
+    description_dm = "Directs messages the specified user with the given message."
 
 
     async def is_owner(ctx): #Checks if the author is the owner
@@ -144,6 +146,15 @@ class Admin(commands.Cog):
             else:
                 self.bot.reload_extension(f"cogs.{arg}")
                 await ctx.channel.send(f"Cog \"{arg}\" has been reloaded.")
+        except:
+            await ctx.channel.send(f"Exception occured")
+
+    @commands.command(brief = brief_dm, description = description_dm)
+    @commands.check(is_owner)
+    async def dm(self, ctx, *args):
+        try:
+            recipient = await commands.UserConverter().convert(ctx, args[0])
+            await recipient.send(" ".join(args[1:]))
         except:
             await ctx.channel.send(f"Exception occured")
 
