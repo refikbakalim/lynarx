@@ -14,7 +14,7 @@ class Numbers(commands.Cog):
     @commands.command(brief = brief_dice, description = description_dice)
     async def dice(self,ctx):
         try:
-            await ctx.channel.send(f"{randint(1,6)} {ctx.author.mention}")
+            await ctx.channel.send(f"{randint(1,6)}", reference = ctx.message)
         except:
             await ctx.channel.send(f"Exception occured")
 
@@ -23,9 +23,9 @@ class Numbers(commands.Cog):
     async def random(self, ctx, *args : int):
         try:
             if(len(args) > 1):
-                await ctx.channel.send(f"{randint(args[0],args[1])} {ctx.author.mention}")
+                await ctx.channel.send(f"{randint(args[0],args[1])}", reference = ctx.message)
             else:
-                await ctx.channel.send(f"{randint(1,args[0])} {ctx.author.mention}")
+                await ctx.channel.send(f"{randint(1,args[0])}", reference = ctx.message)
         except:
             await ctx.channel.send("Exception occured")
 
