@@ -3,6 +3,8 @@ from discord.ext import commands
 import sys
 import os
 
+from discord.ext.commands.converter import UserConverter
+
 class Admin(commands.Cog):
 
     def __init__(self, bot):
@@ -33,10 +35,10 @@ class Admin(commands.Cog):
 
     @commands.command(brief = brief_delete, description = description_delete)
     @commands.check(is_owner)
-    async def delete(self, ctx, arg : int):
+    async def delete(self, ctx, number : int):
         try:
             if ctx.guild is not None:
-                message_number = arg
+                message_number = number
                 if message_number > 0:
                     if message_number > 50:
                         message_number = 50
@@ -49,27 +51,18 @@ class Admin(commands.Cog):
             else:
                 await ctx.message.author.send("This command does not work on direct message.", reference = ctx.message)
         except:
-                await ctx.channel.send(f"Exception occured")
+                await ctx.channel.send("Exception occured")
 
     @commands.command(brief = brief_presence, description = description_presence)
     @commands.check(is_owner)
-    async def presence(self, ctx, *args : str):
+    async def presence(self, ctx, presence : str , * , activity : str = None, link : str = None):
         try:
-            presence = args[0]
-            activity = ""
-            for elem in args[1:]:
-                activity += elem + " "
 
             if presence == "playing":
                 await self.bot.change_presence(activity=discord.Game(name=activity))
                 await ctx.channel.send(f"Changed rich presence to \"Playing {activity}\"")
 
             elif presence == "streaming":
-                length = len(args)
-                activity = ""
-                link = args[length-1]
-                for elem in args[1:length-1]:
-                    activity += elem + " "
                 await self.bot.change_presence(activity=discord.Streaming(name=activity, url=link))
                 await ctx.channel.send(f"Changed rich presence to \"Streaming {activity}at {link}\"")
 
@@ -85,26 +78,22 @@ class Admin(commands.Cog):
                 await self.bot.change_presence()
                         
             else:
-                await ctx.channel.send(f"Wrong Input")
+                await ctx.channel.send("Wrong Input")
         except:
-            await ctx.channel.send(f"Exception occured")
+            await ctx.channel.send("Exception occured")
 
     @commands.command(brief = brief_prefix, description = description_prefix) 
-    async def prefix(self, ctx, *args : str):
+    async def prefix(self, ctx, *, new_prefix : str = "!"):
         try:
-            if(len(args) == 0):
-                bot_prefix = "!"
-            else:
-                bot_prefix = " ".join(args)
 
-            self.bot.command_prefix = bot_prefix
+            self.bot.command_prefix = new_prefix
 
             with open('prefix.txt', "w") as file:
-                    file.write(bot_prefix)
-            await ctx.channel.send(f"Changed prefix to \"{bot_prefix}\"")
+                    file.write(new_prefix)
+            await ctx.channel.send(f"Changed prefix to \"{new_prefix}\"")
 
         except:
-            await ctx.channel.send(f"Wrong input")
+            await ctx.channel.send("Exception occured")
 
     @commands.command(brief = brief_exit, description = description_exit)
     @commands.check(is_owner)
@@ -121,45 +110,45 @@ class Admin(commands.Cog):
 
     @commands.command(brief = brief_load, description = description_load)
     @commands.check(is_owner)
-    async def load(self, ctx, arg):
+    async def load(self, ctx, cog_name : str):
         try:
-            self.bot.load_extension(f"cogs.{arg}")
-            await ctx.channel.send(f"Cog \"{arg}\" has been loaded.")
+            self.bot.load_extension(f"cogs.{cog_name}")
+            await ctx.channel.send(f"Cog \"{cog_name}\" has been loaded.")
         except:
-            await ctx.channel.send(f"Exception occured")
+            await ctx.channel.send("Exception occured")
 
     @commands.command(brief = brief_unload, description = description_unload)
     @commands.check(is_owner)
-    async def unload(self, ctx, arg):
+    async def unload(self, ctx, cog_name : str):
         try:
-            self.bot.unload_extension(f"cogs.{arg}")
-            await ctx.channel.send(f"Cog \"{arg}\" has been unloaded.")
+            self.bot.unload_extension(f"cogs.{cog_name}")
+            await ctx.channel.send(f"Cog \"{cog_name}\" has been unloaded.")
         except:
-            await ctx.channel.send(f"Exception occured")
+            await ctx.channel.send("Exception occured")
 
     @commands.command(brief = brief_reload, description = description_reload)
     @commands.check(is_owner)
-    async def reload(self, ctx, arg):
+    async def reload(self, ctx, cog_name : str = "all"):
         try:
-            if arg == "all":
+            if cog_name == "all":
                 for filename in os.listdir("./cogs"):
                     if filename.endswith(".py"):
                         self.bot.reload_extension(f"cogs.{filename[:-3]}")
                 await ctx.channel.send("All cogs have been reloaded.")
             else:
-                self.bot.reload_extension(f"cogs.{arg}")
-                await ctx.channel.send(f"Cog \"{arg}\" has been reloaded.")
+                self.bot.reload_extension(f"cogs.{cog_name}")
+                await ctx.channel.send(f"Cog \"{cog_name}\" has been reloaded.")
         except:
-            await ctx.channel.send(f"Exception occured")
+            await ctx.channel.send("Exception occured")
 
     @commands.command(brief = brief_dm, description = description_dm)
     @commands.check(is_owner)
-    async def dm(self, ctx, *args):
+    async def dm(self, ctx, recipient : UserConverter, *, message : str):
         try:
-            recipient = await commands.UserConverter().convert(ctx, args[0])
-            await recipient.send(" ".join(args[1:]))
+            await recipient.send(message)
+            await ctx.message.author.send(f"Sent \"{recipient}\" the message \"{message}\"")
         except:
-            await ctx.channel.send(f"Exception occured")
+            await ctx.channel.send("Exception occured")
 
 def setup(bot):
     bot.add_cog(Admin(bot))

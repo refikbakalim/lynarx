@@ -34,7 +34,7 @@ class Events(commands.Cog):
 
 
     @commands.Cog.listener()
-    async def on_member_update(self, before, after): # log nickname-role changes
+    async def on_member_update(self, before, after): # log nickname-status-activity-role changes
 
         owner = await self.bot.fetch_user(181439459894624256)
         logs_channel = await self.bot.fetch_channel(850160971187486780)
@@ -48,11 +48,11 @@ class Events(commands.Cog):
                 await logs_channel.send(f"\"{before}\"s status has changed, \"{before.status}\" to \"{after.status}\"")
 
             elif not before.activity == after.activity:
-                if before.activity == ActivityType.streaming and after.activity == ActivityType.streaming:
+                if before.activity.type == ActivityType.streaming and after.activity.type == ActivityType.streaming:
                     await logs_channel.send(f"\"{before}\"s activity has changed, \"{str(before.activity.type)[13:]} {before.activity.name} at {before.activity.url} {before.activity.details}\" to \"{str(after.activity.type)[13:]} {after.activity.name} at {after.activity.url} {after.activity.details}\"")
-                elif before.activity == ActivityType.streaming:
+                elif before.activity.type == ActivityType.streaming:
                     await logs_channel.send(f"\"{before}\"s activity has changed, \"{str(before.activity.type)[13:]} {before.activity.name} at {before.activity.url} {before.activity.details}\" to \"{str(after.activity.type)[13:]} {after.activity.name} {after.activity.details}\"")
-                elif after.activity == ActivityType.streaming:
+                elif after.activity.type == ActivityType.streaming:
                     await logs_channel.send(f"\"{before}\"s activity has changed, \"{str(before.activity.type)[13:]} {before.activity.name} {before.activity.details}\" to \"{str(after.activity.type)[13:]} {after.activity.name} at {after.activity.url} {after.activity.details}\"")
                 else:
                     await logs_channel.send(f"\"{before}\"s activity has changed, \"{str(before.activity.type)[13:]} {before.activity.name} {before.activity.details}\" to \"{str(after.activity.type)[13:]} {after.activity.name} {after.activity.details}\"")
@@ -62,7 +62,7 @@ class Events(commands.Cog):
 
 
     @commands.Cog.listener()
-    async def on_user_update(self, before, after): # log user avatar changes
+    async def on_user_update(self, before, after): # log avatar-username-discriminator changes
 
         owner = await self.bot.fetch_user(181439459894624256)
         logs_channel = await self.bot.fetch_channel(850160971187486780)

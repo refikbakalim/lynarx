@@ -43,7 +43,7 @@ class LeagueOfLegends(commands.Cog):
             await ctx.channel.send(f"Exception occured")
 
     @commands.command(brief = brief_aram, description = description_aram)
-    async def aram(self, ctx, *args : int):
+    async def aram(self, ctx, number : int = 5):
         try:
             if ctx.guild is not None:
                 
@@ -57,10 +57,7 @@ class LeagueOfLegends(commands.Cog):
                 aram_in_progress = True
                 message_list = []
                 player_accepted = 0
-                if(len(args) == 0):
-                    player_needed = 5
-                else:
-                    player_needed = args[0]
+                player_needed = number
 
                 if player_needed in {5, 6, 8, 10}:
                         

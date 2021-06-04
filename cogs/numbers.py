@@ -20,12 +20,12 @@ class Numbers(commands.Cog):
 
 
     @commands.command(brief = brief_random, description = description_random) 
-    async def random(self, ctx, *args : int):
+    async def random(self, ctx, number1 : int, number2 : int = None):
         try:
-            if(len(args) > 1):
-                await ctx.channel.send(f"{randint(args[0],args[1])}", reference = ctx.message)
+            if number2 is not None:
+                await ctx.channel.send(f"{randint(number1,number2)}", reference = ctx.message)
             else:
-                await ctx.channel.send(f"{randint(1,args[0])}", reference = ctx.message)
+                await ctx.channel.send(f"{randint(1,number1)}", reference = ctx.message)
         except:
             await ctx.channel.send("Exception occured")
 
