@@ -37,7 +37,7 @@ class LeagueOfLegends(commands.Cog):
             embed.add_field(name = "Team1", value = f"{team1}")
             embed.add_field(name = "Team2", value = f"{team2}")
 
-            await ctx.channel.send(content=None, embed=embed)
+            await ctx.channel.send(content=None, embed=embed, reference = ctx.message)
 
         except:
             await ctx.channel.send(f"Exception occured")
