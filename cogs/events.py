@@ -1,6 +1,5 @@
+from discord.enums import ActivityType
 from discord.ext import commands
-import time
-import datetime
 
 class Events(commands.Cog):
 
@@ -26,7 +25,8 @@ class Events(commands.Cog):
 
         if not message.guild: #on direct message taken, direct message to owner
             owner = await self.bot.fetch_user(181439459894624256)
-            await owner.send(str(message.author) + ": " + str(message.content))
+            if message.author != owner:
+                await owner.send(str(message.author) + ": " + str(message.content))
 
         else:
             if 'ratjam' in message.content.lower(): # if ratJam exists in the message, add its emote as a reaction
@@ -36,21 +36,47 @@ class Events(commands.Cog):
     @commands.Cog.listener()
     async def on_member_update(self, before, after): # log nickname-role changes
 
-        if not before.nick == after.nick:
-            with open("logs.txt", "a", encoding="utf-8") as f:
-                f.write(f"Time: {int(time.time())}, Date:{datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S')},  \"{before}\" changed nickname, Before: \"{before.nick}\", After: \"{after.nick}\"\n")
+        owner = await self.bot.fetch_user(181439459894624256)
+        logs_channel = await self.bot.fetch_channel(850160971187486780)
 
-        else:
-            with open("logs.txt", "a", encoding="utf-8") as f:
-                f.write(f"Time: {int(time.time())}, Date:{datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S')}, \"{before}\" changed roles, Before: \"{before.roles}\", After: \"{after.roles}\"\n")
+        if not before == owner:
+
+            if not before.nick == after.nick:
+                await logs_channel.send(f"\"{before}\"s nickname has changed, \"{before.nick}\" to \"{after.nick}\"")
+
+            elif not before.status == after.status:
+                await logs_channel.send(f"\"{before}\"s status has changed, \"{before.status}\" to \"{after.status}\"")
+
+            elif not before.activity == after.activity:
+                if before.activity == ActivityType.streaming and after.activity == ActivityType.streaming:
+                    await logs_channel.send(f"\"{before}\"s activity has changed, \"{str(before.activity.type)[13:]} {before.activity.name} at {before.activity.url} {before.activity.details}\" to \"{str(after.activity.type)[13:]} {after.activity.name} at {after.activity.url} {after.activity.details}\"")
+                elif before.activity == ActivityType.streaming:
+                    await logs_channel.send(f"\"{before}\"s activity has changed, \"{str(before.activity.type)[13:]} {before.activity.name} at {before.activity.url} {before.activity.details}\" to \"{str(after.activity.type)[13:]} {after.activity.name} {after.activity.details}\"")
+                elif after.activity == ActivityType.streaming:
+                    await logs_channel.send(f"\"{before}\"s activity has changed, \"{str(before.activity.type)[13:]} {before.activity.name} {before.activity.details}\" to \"{str(after.activity.type)[13:]} {after.activity.name} at {after.activity.url} {after.activity.details}\"")
+                else:
+                    await logs_channel.send(f"\"{before}\"s activity has changed, \"{str(before.activity.type)[13:]} {before.activity.name} {before.activity.details}\" to \"{str(after.activity.type)[13:]} {after.activity.name} {after.activity.details}\"")
+                
+            elif not before.roles == after.roles:
+                await logs_channel.send(f"\"{before}\"s roles has changed, \"{before.roles}\" to \"{after.roles}\"")
 
 
     @commands.Cog.listener()
     async def on_user_update(self, before, after): # log user avatar changes
 
-        if not before.avatar == after.avatar:
-            with open("logs.txt", "a", encoding="utf-8") as f:
-                f.write(f"Time: {int(time.time())}, Date:{datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S')},  {before} changed avatar, Before: {before.avatar}, After: {after.avatar}\n")
+        owner = await self.bot.fetch_user(181439459894624256)
+        logs_channel = await self.bot.fetch_channel(850160971187486780)
+
+        if not before == owner:
+
+            if not before.avatar == after.avatar:
+                await logs_channel.send(f"\"{before}\" changed avatar: \"{before.avatar_url}\" to \"{after.avatar_url}\"")
+
+            elif not before.name == after.name:
+                await logs_channel.send(f"\"{before}\"s username has changed: \"{before.name}\" to \"{after.name}\"")
+
+            elif not before.discriminator == after.discriminator:
+                await logs_channel.send(f"\"{before}\"s discriminator has changed: \"{before.discriminator}\" to \"{after.discriminator}\"")
 
 def setup(bot):
     bot.add_cog(Events(bot))
