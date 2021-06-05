@@ -23,9 +23,12 @@ class Extras(commands.Cog):
             await ctx.channel.send("Exception occured")
 
     @commands.command(brief = brief_avatar, description = description_avatar) 
-    async def avatar(self, ctx, user : UserConverter):
+    async def avatar(self, ctx, user : UserConverter = None):
         try:
-            await ctx.send(user.avatar_url)
+            if user == None:
+                await ctx.send(ctx.author.avatar_url)
+            else:
+                await ctx.send(user.avatar_url)
         except:
             await ctx.channel.send("Exception occured")
 
