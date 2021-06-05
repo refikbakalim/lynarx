@@ -7,9 +7,7 @@ def read_prefix(): #reads the prefix it saved before
         lines = f.readlines()
         return lines[0].strip()
 
-intents = discord.Intents.default()
-intents.members = True
-intents.presences = True
+intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix=read_prefix(), intents=intents)
 
