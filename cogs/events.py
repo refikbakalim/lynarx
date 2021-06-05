@@ -48,7 +48,13 @@ class Events(commands.Cog):
                 await logs_channel.send(f"\"{before}\"s status has changed, \"{before.status}\" to \"{after.status}\"")
 
             elif not before.activity == after.activity:
-                await logs_channel.send(f"\"{before}\"s activity has changed, \"{str(before.activity.type)[13:]} {before.activity.name} {before.activity.details} at url={before.activity.url}\" to \"{str(after.activity.type)[13:]} {after.activity.name} {after.activity.details} at url={after.activity.url}\"")
+                if before.activity == None:
+                    await logs_channel.send(f"\"{before}\"s activity has changed, \"Nothing\" to \"{str(after.activity.type)[13:]} {after.activity.name}\"")
+                elif after.activity == None:
+                    await logs_channel.send(f"\"{before}\"s activity has changed, \"{str(before.activity.type)[13:]} {before.activity.name}\" to \"Nothing\"")
+                else:
+                    if not str(before.activity.name) == str(after.activity.name):
+                        await logs_channel.send(f"\"{before}\"s activity has changed, \"{str(before.activity.type)[13:]} {before.activity.name}\" to \"{str(after.activity.type)[13:]} {after.activity.name}\"")
                 
             elif not before.roles == after.roles:
                 difference_list = list(set(before.roles) - set(after.roles)) + list(set(after.roles) - set(before.roles))
