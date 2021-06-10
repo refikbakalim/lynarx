@@ -9,15 +9,10 @@ class LeagueOfLegends(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-
-    brief_teamup = "Makes teams"
-    description_teamup = "Makes two team from the given list of names."
-    brief_aram = "Arams the aram"
-    description_aram ="Starts an invition for aram and builds teams when enough people accepts. Default is 5 players but if two teams needed 6, 8, 10 can be used."
-
-    
-    @commands.command(brief = brief_teamup, description = description_teamup)
-    async def teamup(self, ctx, *args : str):
+ 
+    @commands.command()
+    async def teamup(self, ctx, *args : str): #"Makes two team from the given list of names
+        """Makes teams"""
         try:
             player_list = list(args[:])
             team1_number = floor(len(player_list)/2)
@@ -42,8 +37,9 @@ class LeagueOfLegends(commands.Cog):
         except:
             await ctx.channel.send(f"Exception occured")
 
-    @commands.command(brief = brief_aram, description = description_aram)
-    async def aram(self, ctx, number : int = 5):
+    @commands.command()
+    async def aram(self, ctx, number : int = 5): #Starts an invition for aram and builds teams when enough people accepts. Default is 5 players but if two teams needed 6, 8, 10 can be used
+        """Aram invitation"""
         try:
             if ctx.guild is not None:
                 
@@ -70,7 +66,7 @@ class LeagueOfLegends(commands.Cog):
                     team2_string = ""
 
                     call_msg = "Hazırlık bitti, oyuna girin"
-                    uncall_msg = "Kişi sayısına ulaşılamadı"
+                    uncall_msg = "İptal"
 
                     original_msg = await ctx.channel.send(f"Aram gelen ✅, gelmeyen ❌ {player_needed} kişi gerekiyor {aram_role.mention}")
                     message_list.append(original_msg)
@@ -145,12 +141,9 @@ class LeagueOfLegends(commands.Cog):
 
                             elif str(reaction.emoji) == '🇫':
                                 if user.id == owner.id or user.id == ctx.author.id:
-                                    for player in accepted_list:
-                                            accepted_string = accepted_string + "\n" + str(player)
-                                            uncall_msg = uncall_msg + " " + player.mention
                                     for msg in message_list:
                                             await msg.delete()
-                                    await ctx.channel.send(uncall_msg)
+                                    await ctx.channel.send(uncall_msg, delete_after=3.0)
                                     aram_in_progress = False
                 else:
                     aram_in_progress = False
