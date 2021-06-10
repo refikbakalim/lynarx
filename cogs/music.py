@@ -156,8 +156,6 @@ class Music(commands.Cog):
             self.loop  = not self.loop
             if self.loop:
                 await ctx.channel.send("Loop turned on", reference = ctx.message)
-                if self.now_playing != {}:
-                    self.loop_song = .insert(0,self.now_playing)
             else:
                 await ctx.channel.send("Loop turned off", reference = ctx.message)
         except:
