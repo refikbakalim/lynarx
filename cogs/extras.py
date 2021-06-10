@@ -6,29 +6,31 @@ class Extras(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    brief_echo = "Echoes the message"
-    description_echo = "Echoes the sentence given after command."
-    brief_avatar = "Returns the avatar"
-    description_avatar = "Returns the avatar of the user specified after the command"
-
-    @commands.command(brief = brief_echo, description = description_echo) 
+    @commands.command() 
     async def echo(self, ctx, *, message : str):
+        """Echoes the message"""
         try:
+            logs_channel = await self.bot.fetch_channel(850160971187486780)
             if ctx.guild is not None:
                 await ctx.message.delete()
                 await ctx.channel.send(message)
+                await logs_channel.send(f"\"{ctx.author}\" used echo, \"{ctx.message.content}\"")
             else:
                 await ctx.message.author.send("This command does not work on direct message.", reference = ctx.message)
         except:
             await ctx.channel.send("Exception occured")
 
-    @commands.command(brief = brief_avatar, description = description_avatar) 
-    async def avatar(self, ctx, user : UserConverter = None):
+    @commands.command() 
+    async def avatar(self, ctx, user : UserConverter = None): #Returns the avatar, if no user specified self avatar is returned
+        """Returns the avatar"""
         try:
+            logs_channel = await self.bot.fetch_channel(850160971187486780)
             if user == None:
                 await ctx.send(ctx.author.avatar_url)
+                await logs_channel.send(f"\"{ctx.author}\" used avatar, \"{ctx.message.content}\"")
             else:
                 await ctx.send(user.avatar_url)
+                await logs_channel.send(f"\"{ctx.author}\" used avatar, \"{ctx.message.content}\"")
         except:
             await ctx.channel.send("Exception occured")
 
