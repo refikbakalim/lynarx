@@ -10,32 +10,13 @@ class Admin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    brief_delete = "Deletes messages"
-    description_delete = "Deletes the number of messages given with command. Maximum deletion in one command is 50."
-    brief_presence = "Changes bot activity"
-    description_presence = "Changes activity of the bot. Activities can be playing, streaming, watching and listening. Everything takes an extra argument to show what are they doing in that activity. Streaming takes one more argument that is a twitch link."
-    brief_prefix = "Changes prefix"
-    description_prefix = "Changes the bot's prefix. If no arguments given, the prefix will be changed to \"!\"."
-    brief_exit = "Disconnects the bot"
-    description_exit = "Kills the bot. Only the owner can use it. So, don't bother writing it."
-    brief_restart = "Restarts the bot"
-    description_restart = "Restarts the bot. Bot needs approximately 3 seconds to wake up again."
-    brief_load = "Loads a cog"
-    description_load = "Loads a cog. Commands in that cog can be used now."
-    brief_unload = "Unloads a cog"
-    description_unload = "Unloads a cog. Commands in that cog can not be used now."
-    brief_reload = "Reloads a cog"
-    description_reload = "Reloads a cog. The cog will be updated."
-    brief_dm = "Directs messages the specified"
-    description_dm = "Directs messages the specified user with the given message."
-
-
     async def is_owner(ctx): #Checks if the author is the owner
         return ctx.author.id == 181439459894624256
 
-    @commands.command(brief = brief_delete, description = description_delete)
+    @commands.command()
     @commands.check(is_owner)
-    async def delete(self, ctx, number : int):
+    async def delete(self, ctx, number : int): #Deletes the number of messages given with command. Maximum deletion in one command is 50.
+        """Deletes messages"""
         try:
             if ctx.guild is not None:
                 message_number = number
@@ -53,9 +34,10 @@ class Admin(commands.Cog):
         except:
                 await ctx.channel.send("Exception occured")
 
-    @commands.command(brief = brief_presence, description = description_presence)
+    @commands.command()
     @commands.check(is_owner)
-    async def presence(self, ctx, presence : str , * , activity : str = None, link : str = None):
+    async def presence(self, ctx, presence : str , * , activity : str = None, link : str = None): #Changes activity of the bot. Activities can be playing, streaming, watching and listening. Everything takes an extra argument to show what are they doing in that activity. Streaming takes one more argument that is a twitch link.
+        """Changes bot activity"""
         try:
 
             if presence == "playing":
@@ -82,8 +64,9 @@ class Admin(commands.Cog):
         except:
             await ctx.channel.send("Exception occured")
 
-    @commands.command(brief = brief_prefix, description = description_prefix) 
-    async def prefix(self, ctx, *, new_prefix : str = "!"):
+    @commands.command() 
+    async def prefix(self, ctx, *, new_prefix : str = "!"): # Changes the bot's prefix. If no arguments given, the prefix will be changed to "!"
+        """Changes the bot prefix"""
         try:
 
             self.bot.command_prefix = new_prefix
@@ -95,40 +78,45 @@ class Admin(commands.Cog):
         except:
             await ctx.channel.send("Exception occured")
 
-    @commands.command(brief = brief_exit, description = description_exit)
+    @commands.command()
     @commands.check(is_owner)
     async def exit(self, ctx):
+        """Disconnects the bot"""
         await ctx.channel.send("Disconnecting...")
         await self.bot.close()
 
-    @commands.command(brief = brief_restart, description = description_restart)
+    @commands.command()
     @commands.check(is_owner)
-    async def restart(self, ctx):
+    async def restart(self, ctx): #Restarts the bot. Bot needs approximately 3 seconds to wake up again
+        """Restarts the bot"""
         await ctx.channel.send("Restarting... Wait for 3 seconds.") # to make sure bot is connected after restarting
         python = sys.executable
         os.execl(python, python, * sys.argv)
 
-    @commands.command(brief = brief_load, description = description_load)
+    @commands.command()
     @commands.check(is_owner)
-    async def load(self, ctx, cog_name : str):
+    async def load(self, ctx, cog_name : str): #Loads a cog. Commands in that cog can be used now.
+        """Loads a cog"""
         try:
             self.bot.load_extension(f"cogs.{cog_name}")
             await ctx.channel.send(f"Cog \"{cog_name}\" has been loaded.")
         except:
             await ctx.channel.send("Exception occured")
 
-    @commands.command(brief = brief_unload, description = description_unload)
+    @commands.command()
     @commands.check(is_owner)
-    async def unload(self, ctx, cog_name : str):
+    async def unload(self, ctx, cog_name : str): #Unloads a cog. Commands in that cog can not be used now.
+        """Unloads a cog"""
         try:
             self.bot.unload_extension(f"cogs.{cog_name}")
             await ctx.channel.send(f"Cog \"{cog_name}\" has been unloaded.")
         except:
             await ctx.channel.send("Exception occured")
 
-    @commands.command(brief = brief_reload, description = description_reload)
+    @commands.command()
     @commands.check(is_owner)
-    async def reload(self, ctx, cog_name : str = "all"):
+    async def reload(self, ctx, cog_name : str = "all"): #Reloads a cog if a single arg given, if arg is "all" or there is none then reload all
+        """Reloads a cog or all cogs"""
         try:
             if cog_name == "all":
                 for filename in os.listdir("./cogs"):
@@ -141,9 +129,10 @@ class Admin(commands.Cog):
         except:
             await ctx.channel.send("Exception occured")
 
-    @commands.command(brief = brief_dm, description = description_dm)
+    @commands.command()
     @commands.check(is_owner)
     async def dm(self, ctx, recipient : UserConverter, *, message : str):
+        """Directs messages the specified user"""
         try:
             await recipient.send(message)
             await ctx.message.author.send(f"Sent \"{recipient}\" the message \"{message}\"")
