@@ -29,8 +29,8 @@ class LeagueOfLegends(commands.Cog):
             for player in player_list[team1_number:]:
                 team2 = team2 + "\n" + str(player)
 
-            embed.add_field(name = "Team1", value = f"{team1}")
-            embed.add_field(name = "Team2", value = f"{team2}")
+            embed.add_field(name = "Team1", value = team1)
+            embed.add_field(name = "Team2", value = team2)
 
             await ctx.channel.send(content=None, embed=embed, reference = ctx.message)
 
