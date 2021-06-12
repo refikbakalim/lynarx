@@ -1,8 +1,12 @@
 import discord
 import youtube_dl
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
 from discord.ext import commands
 from random import shuffle
+from math import ceil
 
+spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
 youtube_dl.utils.bug_reports_message = lambda: ''
 
 ytdl_format_options = {
@@ -118,12 +122,53 @@ class Music(commands.Cog):
     @commands.command()
     async def queue(self, ctx):
         """Shows the music queue"""
-        queue = ""
-        for i in range(0, len(self.music_queue)):
-            queue += str(i+1) + ". " + self.music_queue[i]['title'] + "\n"
 
-        if queue != "":
-            await ctx.channel.send(queue, reference = ctx.message)
+        added = ""
+        i = 1
+        j = 1
+        k = 1
+
+        embed = discord.Embed(title = f"Song Queue Part {k}")
+        
+        embed_length = 0
+
+        if len(self.music_queue) > 0:
+
+            for song in self.music_queue:
+
+                to_be_added = str(i) + ". " + song['title'] + "\n"
+
+                if len(added) + len(to_be_added) > 1024:
+
+                    if embed_length + len(added) > 6000:
+
+                        await ctx.channel.send(content=None, embed=embed, reference = ctx.message)
+                        embed_length = 0
+                        k += 1
+                        embed = discord.Embed(title = f"Song Queue Part {k}")
+
+                    embed.add_field(name = f"Songs {j}", value = added)
+                    embed_length += len(added)
+                    added = to_be_added
+                    j += 1
+
+                else:
+                    added += to_be_added
+
+                i += 1
+
+            if len(added) > 0:
+
+                if embed_length + len(added) > 6000:
+
+                    await ctx.channel.send(content=None, embed=embed, reference = ctx.message)
+                    k += 1
+                    embed = discord.Embed(title = f"Song Queue Part {k}")
+
+                embed.add_field(name = f"Songs {j}", value = added)
+
+            await ctx.channel.send(content=None, embed=embed, reference = ctx.message)
+            
         else:
             await ctx.channel.send("The music queue is empty", reference = ctx.message)
 
@@ -191,7 +236,35 @@ class Music(commands.Cog):
         if self.vc != "":
             self.vc.resume()
 
+    @commands.command()
+    async def splay(self, ctx, playlist_url):
+        """Gets Spotify playlist and searchs on Youtube"""
+
+        results = spotify.user_playlist_tracks(user="",playlist_id=playlist_url)
+        track_list = []
+
+        for i in results["items"]:
+
+            if (i["track"]["artists"].__len__() == 1):
+
+                track_list.append(i["track"]["name"] + " - " + i["track"]["artists"][0]["name"])
+
+            else:
+                name_string = ""
+
+                for index, b in enumerate(i["track"]["artists"]):
+                    name_string += (b["name"])
+
+                    if (i["track"]["artists"].__len__() - 1 != index):
+                        name_string += ", "
+
+                track_list.append(i["track"]["name"] + " - " + name_string)   
+
+        for track in track_list:
+            await self.play(ctx=ctx, query=track)
+
     @play.before_invoke
+    @splay.before_invoke
     async def ensure_voice(self, ctx):
         if self.vc is None:
             if ctx.voice_client is None:
