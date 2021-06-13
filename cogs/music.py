@@ -263,6 +263,14 @@ class Music(commands.Cog):
         for track in track_list:
             await self.play(ctx=ctx, query=track)
 
+    @commands.command()
+    async def skipto(self, ctx, index:int):
+        """Skips to the specified song"""
+        if self.vc != "":
+            self.vc.pause()
+            self.music_queue.insert(0, self.music_queue.pop(index-1))
+            self.play_music()
+
     @play.before_invoke
     @splay.before_invoke
     async def ensure_voice(self, ctx):
