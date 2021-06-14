@@ -1,5 +1,6 @@
 from discord.ext import commands
-from discord.ext.commands.converter import MemberConverter, UserConverter
+from discord.ext.commands.converter import UserConverter
+from random import randint
 
 class Extras(commands.Cog):
 
@@ -31,6 +32,15 @@ class Extras(commands.Cog):
             else:
                 await ctx.send(user.avatar_url)
                 await logs_channel.send(f"\"{ctx.author}\" used avatar, \"{ctx.message.content}\"")
+        except:
+            await ctx.channel.send("Exception occured")
+
+    @commands.command() 
+    async def choose(self, ctx, *, options):
+        """Chooses 1 option, seperate with \",\""""
+        try:
+            options = options.split(",")
+            await ctx.channel.send(options[randint(0,len(options)-1)], reference = ctx.message)
         except:
             await ctx.channel.send("Exception occured")
 
