@@ -4,7 +4,6 @@ import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 from discord.ext import commands
 from random import shuffle
-from math import ceil
 
 spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
 youtube_dl.utils.bug_reports_message = lambda: ''
@@ -30,7 +29,6 @@ ffmpeg_options = {
 
 ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 
-
 class Music(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -44,7 +42,6 @@ class Music(commands.Cog):
         self.loop = False
 
         self.now_playing = {}
-
 
     @commands.command()
     async def join(self, ctx, *, channel: discord.VoiceChannel):
@@ -98,21 +95,12 @@ class Music(commands.Cog):
                 self.now_playing = self.music_queue[0]
                 self.play_music()
 
-    @commands.command()
-    async def volume(self, ctx, volume: int):
-        """Changes the player's volume"""
-
-        if ctx.voice_client is None:
-            return await ctx.send("Not connected to a voice channel.")
-        if volume <= 200:
-            ctx.voice_client.source.volume = volume / 100
-            await ctx.send(f"Changed volume to {volume}%")
 
     @commands.command()
     async def stop(self, ctx):
         """Stops and disconnects the bot from voice"""
 
-        await ctx.voice_client.disconnect()
+        await ctx.voice_client.disconnect(force=True)
         self.vc = None
         self.music_queue = []
         self.is_playing = False
@@ -183,6 +171,15 @@ class Music(commands.Cog):
             await ctx.channel.send("Exception occured")
 
     @commands.command()
+    async def clear(self, ctx):
+        """Cleares the music queue"""
+        try:
+                self.music_queue.clear()
+                await ctx.channel.send(f"Cleared the music queue", reference = ctx.message)
+        except:
+            await ctx.channel.send("Exception occured")
+
+    @commands.command()
     async def shuffle(self, ctx):
         """Shuffles the queue"""
         try:
@@ -242,6 +239,9 @@ class Music(commands.Cog):
 
         results = spotify.user_playlist_tracks(user="",playlist_id=playlist_url)
         track_list = []
+
+        song_number = len(results["items"])
+        await ctx.channel.send(f"Adding {song_number} songs to queue, it can take about {song_number} seconds.")
 
         for i in results["items"]:
 
